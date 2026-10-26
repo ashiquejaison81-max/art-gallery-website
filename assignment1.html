@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artistic Canvas - Online Gallery</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 15px;
+        }
+
+        nav a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active {
+            color: #fff;
+            border-bottom: 2px solid #e74c3c;
+        }
+
+        /* Main Container */
+        .container {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            width: 100%;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Forms (Login/Signup) */
+        .auth-card {
+            max-width: 400px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .auth-card h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #1a1a1a;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #e74c3c;
+        }
+
+        /* Hero / Home Page */
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: #ffffff;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .hero p {
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            line-height: 1.6;
+        }
+
+        /* Art Grids */
+        .art-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .art-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .art-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .art-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .art-card-body {
+            padding: 1.2rem;
+        }
+
+        .art-card-body h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .art-card-body p {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Art Details Page */
+        .detail-container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .detail-main {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .detail-main img {
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .detail-info {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .detail-info h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-info .meta {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .detail-info p {
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        .similar-section {
+            border-top: 1px solid #eee;
+            padding-top: 2rem;
+        }
+
+        .similar-section h3 {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1a1a1a;
+            color: #888;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="logo" onclick="navigateTo('home')">ARTISTIC.</div>
+        <ul>
+            <li><a onclick="navigateTo('home')" id="nav-home" class="active">Home</a></li>
+            <li><a onclick="navigateTo('gallery')" id="nav-gallery">Art Display</a></li>
+            <li><a onclick="navigateTo('login')" id="nav-login">Login</a></li>
+            <li><a onclick="navigateTo('signup')" id="nav-signup">Sign Up</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+
+        <!-- 1. GALLERY HOME PAGE -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1>Explore Masterpieces</h1>
+                <p>Welcome to Artistic Canvas. Discover curated artworks, learn about historical creators, and explore distinct artistic categories from around the globe.</p>
+                <button class="btn" style="width: auto; padding: 0.8rem 2rem;" onclick="navigateTo('gallery')">Browse Collection</button>
+            </div>
+            <h2>Featured Artworks</h2>
+            <br>
+            <div class="art-grid" id="home-featured-grid">
+                <!-- Javascript will populate featured artworks -->
+            </div>
+        </section>
+
+        <!-- 2. LOGIN PAGE -->
+        <section id="login" class="page">
+            <div class="auth-card">
+                <h2>Welcome Back</h2>
+                <form onsubmit="event.preventDefault(); alert('Logged in successfully!'); navigateTo('home');">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3. SIGNUP PAGE -->
+        <section id="signup" class="page">
+            <div class="auth-card">
+                <h2>Create Account</h2>
+                <form onsubmit="event.preventDefault(); alert('Account created successfully!'); navigateTo('home');">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn">Sign Up</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. ART DISPLAY PAGE (List Available Art) -->
+        <section id="gallery" class="page">
+            <h1 style="margin-bottom: 1.5rem;">All Art Pieces</h1>
+            <div class="art-grid" id="gallery-grid">
+                <!-- Javascript will populate all artworks -->
+            </div>
+        </section>
+
+        <!-- 5 to 9. INDIVIDUAL ART PIECE PAGES (Dynamic View) -->
+        <section id="art-detail" class="page">
+            <button class="btn" style="width: auto; margin-bottom: 1.5rem; background: #666;" onclick="navigateTo('gallery')">&larr; Back to Gallery</button>
+            <div class="detail-container">
+                <div class="detail-main">
+                    <img id="detail-img" src="" alt="">
+                    <div class="detail-info">
+                        <h1 id="detail-title">Art Title</h1>
+                        <div class="meta">
+                            By <span id="detail-artist">Artist</span> (<span id="detail-year">Year</span>)
+                        </div>
+                        <p id="detail-description">Description text goes here...</p>
+                        <p><strong>Category:</strong> <span id="detail-category">Category</span></p>
+                    </div>
+                </div>
+
+                <div class="similar-section">
+                    <h3>Similar Art Pieces in the Same Category</h3>
+                    <div class="art-grid" id="similar-grid">
+                        <!-- Similar items dynamically injected -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2026 Artistic Canvas. All rights reserved.
+    </footer>
+
+    <!-- JavaScript Navigation & Data Management -->
+    <script>
+        // Data for 5 Artpieces
+        const artPieces = [
+            {
+                id: "art-1",
+                title: "Starry Night",
+                artist: "Vincent van Gogh",
+                year: "1889",
+                category: "Impressionism",
+                image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
+                description: "The Starry Night depicts the view from the east-facing window of Vincent van Gogh's asylum room at Saint-Rémy-de-Provence, just before sunrise, with the addition of an idealized village."
+            },
+            {
+                id: "art-2",
+                title: "Mona Lisa",
+                artist: "Leonardo da Vinci",
+                year: "1503",
+                category: "Renaissance",
+                image: "https://images.unsplash.com/photo-1561214115-f2f134cc4912?auto=format&fit=crop&w=600&q=80",
+                description: "A half-length portrait painting considered an archetypal masterpiece of the Italian Renaissance. It is characterized by its enigmatic expression and subtle modeling of form."
+            },
+            {
+                id: "art-3",
+                title: "The Great Wave",
+                artist: "Hokusai",
+                year: "1831",
+                category: "Impressionism",
+                image: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?auto=format&fit=crop&w=600&q=80",
+                description: "A woodblock print created by Japanese ukiyo-e artist Hokusai. It depicts an enormous wave framing Mount Fuji in the background."
+            },
+            {
+                id: "art-4",
+                title: "Girl with a Pearl Earring",
+                artist: "Johannes Vermeer",
+                year: "1665",
+                category: "Renaissance",
+                image: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80",
+                description: "An oil painting depicting a European girl wearing an exotic dress, an oriental turban, and what was thought to be a very large pearl earring."
+            },
+            {
+                id: "art-5",
+                title: "The Scream",
+                artist: "Edvard Munch",
+                year: "1893",
+                category: "Impressionism",
+                image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=600&q=80",
+                description: "An iconic expressionist creation showing a agonized figure against a blood-red sky, symbolizing modern angst and spiritual anxiety."
+            }
+        ];
+
+        // SPA Navigation Function
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            const navLink = document.getElementById(`nav-${pageId}`);
+            if(navLink) {
+                navLink.classList.add('active');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Render Artwork Card Element
+        function createArtCard(art) {
+            return `
+                <div class="art-card">
+                    <img src="${art.image}" alt="${art.title}">
+                    <div class="art-card-body">
+                        <h3>${art.title}</h3>
+                        <p>By ${art.artist}</p>
+                        <button class="btn" onclick="loadArtDetail('${art.id}')">View Details</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load Main Art Display Grid
+        function renderGallery() {
+            const galleryGrid = document.getElementById('gallery-grid');
+            const homeGrid = document.getElementById('home-featured-grid');
+            
+            galleryGrid.innerHTML = artPieces.map(art => createArtCard(art)).join('');
+            homeGrid.innerHTML = artPieces.slice(0, 3).map(art => createArtCard(art)).join('');
+        }
+
+        // Load Individual Art Detail Page (Handles pages 5-9)
+        function loadArtDetail(artId) {
+            const art = artPieces.find(item => item.id === artId);
+            if (!art) return;
+
+            // Populate fields
+            document.getElementById('detail-img').src = art.image;
+            document.getElementById('detail-title').innerText = art.title;
+            document.getElementById('detail-artist').innerText = art.artist;
+            document.getElementById('detail-year').innerText = art.year;
+            document.getElementById('detail-description').innerText = art.description;
+            document.getElementById('detail-category').innerText = art.category;
+
+            // Populate 2-3 similar art pieces in the same category
+            const similarPieces = artPieces.filter(item => item.category === art.category && item.id !== art.id);
+            const similarGrid = document.getElementById('similar-grid');
+            
+            if (similarPieces.length > 0) {
+                similarGrid.innerHTML = similarPieces.map(item => createArtCard(item)).join('');
+            } else {
+                similarGrid.innerHTML = `<p style="color:#888;">No other artwork currently found in the ${art.category} category.</p>`;
+            }
+
+            navigateTo('art-detail');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderGallery();
+        };
+    </script>
+</body>
+</html>
